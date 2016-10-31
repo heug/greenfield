@@ -10,7 +10,11 @@ const userSchema = mongoose.Schema({
   following: Array,
   followers: Array,
   recordings: Array,
-  comments: Array
+  comments: Array,
+  tagline: String,
+  description: String,
+  picture: String,
+  station: String
 });
 
 const UserModel = mongoose.model('User', userSchema);

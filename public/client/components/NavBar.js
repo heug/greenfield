@@ -29,6 +29,7 @@ class NavBar extends React.Component {
           <ul className="navList">
             <li><Link to="/recorder" className={"navItem " + (this.props.activeTab === 'recorder' ? 'active' : '')}>Recorder</Link></li>
             <li><Link to="/player" className={"navItem " + (this.props.activeTab === 'player' ? 'active' : '')}>Player</Link></li>
+            <li><Link to="/about" className={"navItem " + (this.props.activeTab === 'about' ? 'active' : '')}>About</Link></li>
             <li><a href="#" className={"navItem " + (this.props.activeTab === 'login' ? 'active' : '')}>Login</a></li>
             <li><Link to="/register" className={"navItem " + (this.props.activeTab === 'register' ? 'active' : '')}>Register</Link></li>
             <li onClick={logout}><a href="#" target="_self" className="navItem">Logout</a></li>

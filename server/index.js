@@ -176,6 +176,7 @@ app.post('/api/recordings', (req, res) =>
 
 // get a list of users
 app.get('/api/users', (req, res) => {
+
   console.log('get users')
   User.findAll((err, users) => {
     if (err) { return done(err); }

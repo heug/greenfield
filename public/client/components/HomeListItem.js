@@ -1,5 +1,6 @@
 import styles from 'style';
 import React from 'react';
+import { Link } from 'react-router';
 
 class HomeListItem extends React.Component {
   constructor(props) {
@@ -11,15 +12,13 @@ class HomeListItem extends React.Component {
   };
 
   render() {
-
     return(
-	      <div className="userBox" onClick={()=>{this.props.handleClick(this.props.user)}}>
-					<div> <strong>{this.props.user.username}</strong> </div>
-					<img src={this.props.user.pic} />
-					<div> {this.props.user.description} </div>
-				</div>
+      <Link to="" className="userBox" onClick={()=>{this.props.handleClick(this.props.user)}}>
+				<div className="userBoxText"><strong>{this.props.user.station}</strong></div>
+				<img src={this.props.user.picture} />
+				<div className="userBoxText">{this.props.user.tagline}</div>
+			</Link>
     )
-
   }
 
 
