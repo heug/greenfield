@@ -11,7 +11,7 @@ class Register extends React.Component {
       password: null
     };
   }
-  
+
   addUser(e) {
     e.preventDefault();
     var url = '/api/register';
@@ -32,23 +32,26 @@ class Register extends React.Component {
   render() {
     return (
       <div>
-        <h1>Registration Page!</h1>
-        <form onSubmit={this.addUser}>
-          <div>
-            <label for="username">Username</label>
-            <input type="text" name="username" value={this.state.username}/>
+        <h1>Register</h1>
+        <form onSubmit={this.addUser} className="registerForm">
+         <div className="registerBox">
+            <div className="registerInput">
+              <label htmlFor="username">Username</label>
+              <input type="text" name="username" value={this.state.username}/>
+            </div>
+            <div className="registerInput">
+              <label htmlFor="password">Password</label>
+              <input type="text" name="password" value={this.state.password}/>
+            </div>
+            <div className="registerInput">
+              <label htmlFor="email">E-mail Address</label>
+              <input type="text" name="email" value={this.state.email}/>
+            </div>
+            <div className="registerInput registerButton">
+              <input type="submit" value="Register"/>
+            </div>
           </div>
-          <div>
-            <label for="password">Password</label>
-            <input type="text" name="password" value={this.state.password}/>
-          </div>
-          <div>
-            <label for="email">E-mail Address</label>
-            <input type="text" name="email" value={this.state.email}/>
-          </div>
-          <div>
-            <input type="submit" value="Register"/>
-          </div>
+          <div className="opacityBG5"></div>
         </form>
       </div>
     );

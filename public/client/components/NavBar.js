@@ -10,20 +10,34 @@ const logout = function(e) {
     .success(function(data) {
       window.location = data;
     });
-}; 
+};
 
-const NavBar = () => (
-  <div className="nav">
-    <ul>
-      <li><Link to="/recorder">Recorder</Link></li>
-      <li><Link to="/player">Player</Link></li>
-      <li><a href="#">About</a></li>
-      <li><input placeholder="Search..."></input></li>
-      <li><Link to="/login">Login</Link></li>
-      <li><Link to="/register">Register</Link></li>
-      <li onClick={logout}><a href="#" target="_self">Logout</a></li>
-    </ul>
-  </div>  
-);
+class NavBar extends React.Component {
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+
+  //   };
+  // }
+
+  render() {
+    return (
+      <div className="header">
+        <Link to="/" className="logo">RADRADIO</Link>
+        <div className="nav">
+          <ul className="navList">
+            <li><Link to="/recorder" className={"navItem " + (this.props.activeTab === 'recorder' ? 'active' : '')}>Recorder</Link></li>
+            <li><Link to="/player" className={"navItem " + (this.props.activeTab === 'player' ? 'active' : '')}>Player</Link></li>
+            <li><Link to="/about" className={"navItem " + (this.props.activeTab === 'about' ? 'active' : '')}>About</Link></li>
+            <li><a href="#" className={"navItem " + (this.props.activeTab === 'login' ? 'active' : '')}>Login</a></li>
+            <li><Link to="/register" className={"navItem " + (this.props.activeTab === 'register' ? 'active' : '')}>Register</Link></li>
+            <li onClick={logout}><a href="#" target="_self" className="navItem">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+}
 
 export default NavBar;

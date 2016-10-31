@@ -1,29 +1,34 @@
 'use strict';
 
 // debug ====================================================================
-var debug = require('debug');
+const debug = require('debug');
 debug.enable('server:*');
-var log = debug('server:log');
-var info = debug('server:info');
-var error = debug('server:error');
+const log = debug('server:log');
+const info = debug('server:info');
+const error = debug('server:error');
 
 // set up ===================================================================
+const Promise = require('bluebird');
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const expressSession = require('express-session');
 const MongoStore = require('connect-mongo')(expressSession);
 const passport = require('passport');
 const flash = require('flash');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
 const db = require('./config/db.js');
 const password = require('./config/secret.js');
-const Promise = require('bluebird');
-let LocalStrategy = require('passport-local').Strategy;
+
+const https = require('https');
 const mediaRepo = require('./media-repo/media-repo');
-const port = process.env.PORT || 8000;
+const broadcasting = require('./broadcasting/broadcasting');
+
+const port = process.env.PORT || 8443;
 
 const app = express();
 
@@ -46,7 +51,7 @@ app.use(expressSession({
   secret: password.phrase,
   resave: true,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     secure: false,
     maxAge: 30 * 24 * 60 * 60
   },
@@ -75,7 +80,7 @@ passport.deserializeUser(function(id, done) {
 // passport login schema
 passport.use(new LocalStrategy({
   passReqToCallback: true
-}, 
+},
 function(req, username, password, done) {
   User.findOne(username, function(err, user) {
     if (err) { return done(err); }
@@ -138,7 +143,7 @@ app.post('/api/register', (req, res) => {
           if (err) { console.error('Error logging in', err); }
           console.log('logged in as', req.body.username);
           return res.end('/recorder');
-        }); 
+        });
       });
     }
   });
@@ -156,18 +161,29 @@ app.get('/api/recording/:id', (req, res) =>
 
 // delete recording from id
 app.delete('/api/recording/:id', (req, res) =>
-  mediaRepo.deleteItem(req.params.id).then(data => res.status(200)).catch(err => res.status(500).json(err))
+  mediaRepo.deleteItem(req.params.id).then(() => res.sendStatus(200)).catch(err => res.status(500).json(err))
 );
 
 // update recording metadata from id
 app.put('/api/recording/:id', (req, res) =>
-  mediaRepo.updateItem(req.params.id, req.body).then(data => res.status(200)).catch(err => res.status(500).json(err))
+  mediaRepo.updateItem(req.params.id, req.body).then(() => res.sendStatus(200)).catch(err => res.status(500).json(err))
 );
 
 // get list of recordings (returns list of recording IDs)
-app.get('/api/recordings', (req, res) =>
+app.post('/api/recordings', (req, res) =>
   mediaRepo.findItems(req.body).then(data => res.status(200).json(data)).catch(err => res.status(500).json(err))
 );
+
+// get a list of users
+app.get('/api/users', (req, res) => {
+
+  console.log('get users')
+  User.findAll((err, users) => {
+    if (err) { return done(err); }
+    console.log('users gotten', users)
+    res.send(users);
+  });
+});
 
 app.get('/login', (req, res) =>
   res.sendFile(path.resolve(__dirname, '../public', 'index.html'))
@@ -187,14 +203,24 @@ app.get('*', (req, res, next) =>
   res.sendFile(path.resolve(__dirname, '../public', 'index.html'))
 );
 
+// key/certificate for https server
+const sslPath = process.env.SSL_PATH || '/etc/letsencrypt/live/radradio.stream';
+const options = {
+  key: fs.readFileSync(sslPath + '/privkey.pem'),
+  cert: fs.readFileSync(sslPath + '/fullchain.pem')
+};
 
-// listen (start app with node / nodemon index.js) ==========================
-app.listen(port, err => {
+// secure server setup
+const server = https.createServer(options, app);
+broadcasting.startWss(server);
+
+// start server
+server.listen(port, err => {
   if (err) {
     error('Error while trying to start the server (port already in use maybe?)');
     return err;
   }
-  info(`server listening on port ${port}`);
+  info(`secure server listening on port ${port}`);
 });
 
 module.exports = app;
